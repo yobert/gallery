@@ -54,7 +54,7 @@ img, video {
 <a class="view" href="{{ .ViewPath }}"><img src="{{ .ThumbPath }}" width="{{ .ThumbWidth }}" height="{{ .ThumbHeight }}" /></a>
 {{- else -}}
 {{- if .Video -}}
-<a class="view" href="{{ .ViewPath }}"><video autoplay=true loop=true muted=true src="{{ .ThumbPath }}" width="{{ .ThumbWidth }}" height="{{ .ThumbHeight }}" /></a>
+<a class="view" href="{{ .ViewPath }}"><video autoplay=true loop=true muted=true disableRemotePlayback=true src="{{ .ThumbPath }}" width="{{ .ThumbWidth }}" height="{{ .ThumbHeight }}" /></a>
 {{- else -}}
 <div class="binary"><a href="{{ .Path }}">{{ .Path }}</a> ({{ .SizeNice }})</div>
 {{- end -}}

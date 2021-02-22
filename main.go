@@ -228,7 +228,7 @@ func run() error {
 					"-crf", "23",
 					"-c:a", "libmp3lame",
 					"-q:a", "6",
-					"-ac", "1",
+					"-strict", "-1",
 					big)
 				cmd.Stdout = os.Stdout
 				cmd.Stderr = os.Stderr
