@@ -58,7 +58,7 @@ func run() error {
 	src := path.Clean(os.Args[1])
 	dst := path.Clean(os.Args[2])
 
-	limit := 500
+	//	limit := 500
 	count := 0
 
 	files := []*File{}
@@ -68,6 +68,8 @@ func run() error {
 	fmt.Println("Scanning", src, "...")
 
 	err := filepath.Walk(src, func(fpath string, fi os.FileInfo, err error) error {
+		//fmt.Println(fpath)
+
 		suf := strings.TrimPrefix(fpath, src)
 
 		if strings.HasPrefix(fi.Name(), ".") {
@@ -88,8 +90,12 @@ func run() error {
 			//	gallery.Folders = append(gallery.Folders, &Folder{Path: path.Dir(gallery.Path), Name: "<- Back"})
 			//}
 
+			if err := os.MkdirAll(dst+suf, 0755); err != nil {
+				return err
+			}
+
 			galleries[gallery.Path] = gallery
-			fmt.Println("added gallery", gallery.Path, gallery.Dest)
+			//fmt.Println("added gallery", gallery.Path, gallery.Dest)
 
 			// now add to parent gallery folder list
 			if gallery.Path != "" {
@@ -97,7 +103,7 @@ func run() error {
 				if parent == "/" {
 					parent = ""
 				}
-				fmt.Printf("parent would be: %#v\n", parent)
+				//fmt.Printf("parent would be: %#v\n", parent)
 				gp, ok := galleries[parent]
 				if !ok {
 					return fmt.Errorf("Cannot find parent gallery %#v for gallery %#v", parent, gallery.Path)
@@ -108,9 +114,9 @@ func run() error {
 		}
 
 		count++
-		if count > limit {
-			return nil
-		}
+		//		if count > limit {
+		//			return nil
+		//		}
 
 		newpath := dst + suf
 
@@ -140,14 +146,19 @@ func run() error {
 	fmt.Println("Generating files and thumbnails and stuff ...")
 
 	for _, file := range files {
-		dir := path.Dir(file.Dest)
-		if _, err := os.Stat(dir); err != nil {
-			if err := os.MkdirAll(dir, 0755); err != nil {
-				return err
-			}
-		}
+		//fmt.Println(file.Path)
+
+		//		dir := path.Dir(file.Dest)
+		//		if _, err := os.Stat(dir); err != nil {
+		//			if err := os.MkdirAll(dir, 0755); err != nil {
+		//				return err
+		//			}
+		//		}
 
 		dp := path.Dir(file.Path)
+		if dp == "/" {
+			dp = ""
+		}
 
 		if _, err := os.Stat(file.Dest); err != nil {
 			cmd := exec.Command("cp", "--reflink=auto",
