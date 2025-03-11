@@ -29,11 +29,15 @@ type File struct {
 	ThumbPath   string
 	ThumbWidth  int
 	ThumbHeight int
+
+	Prefix string
 }
 
 type Folder struct {
 	Path string
 	Name string
+
+	Prefix string
 }
 
 type Gallery struct {
@@ -41,6 +45,8 @@ type Gallery struct {
 	Files   []*File
 	Dest    string
 	Path    string
+
+	Prefix string
 }
 
 func main() {
@@ -51,12 +57,16 @@ func main() {
 }
 
 func run() error {
-	if len(os.Args) != 3 {
-		return fmt.Errorf("Usage: gallery <source dir> <dest dir>")
+	if len(os.Args) < 3 {
+		return fmt.Errorf("Usage: gallery <source dir> <dest dir> [optional output prefix, e.g. '/blah']")
 	}
 
 	src := path.Clean(os.Args[1])
 	dst := path.Clean(os.Args[2])
+	prefix := ""
+	if len(os.Args) > 3 {
+		prefix = os.Args[3]
+	}
 
 	//	limit := 500
 	count := 0
@@ -80,14 +90,15 @@ func run() error {
 		}
 		if fi.IsDir() {
 			gallery := &Gallery{
-				Path: suf,
-				Dest: dst + suf + "/index.html",
+				Path:   suf,
+				Dest:   dst + suf + "/index.html",
+				Prefix: prefix,
 			}
 			if _, dup := galleries[gallery.Path]; dup {
 				return fmt.Errorf("Duplicate gallery %#v", gallery.Path)
 			}
 			//if suf != "" {
-			//	gallery.Folders = append(gallery.Folders, &Folder{Path: path.Dir(gallery.Path), Name: "<- Back"})
+			//	gallery.Folders = append(gallery.Folders, &Folder{Path: path.Dir(gallery.Path), Name: "<- Back", Prefix: gallery.Prefix})
 			//}
 
 			if err := os.MkdirAll(dst+suf, 0755); err != nil {
@@ -108,7 +119,7 @@ func run() error {
 				if !ok {
 					return fmt.Errorf("Cannot find parent gallery %#v for gallery %#v", parent, gallery.Path)
 				}
-				gp.Folders = append(gp.Folders, &Folder{Path: gallery.Path, Name: fi.Name()})
+				gp.Folders = append(gp.Folders, &Folder{Path: gallery.Path, Name: fi.Name(), Prefix: gallery.Prefix})
 			}
 			return nil
 		}
@@ -126,6 +137,7 @@ func run() error {
 			Path:     suf,
 			ViewPath: suf + "_view/",
 			SizeNice: formatSize(fi.Size()),
+			Prefix:   prefix,
 		}
 
 		if hasImageSuffix(fpath) {
@@ -223,12 +235,19 @@ func run() error {
 			if _, err := os.Stat(big); err != nil {
 				cmd := exec.Command("ffmpeg",
 					"-i", file.Source,
+
 					"-c:v", "libx264",
-					"-preset", "slow",
+					"-preset", "veryfast",
 					"-crf", "23",
-					"-c:a", "libmp3lame",
-					"-q:a", "6",
-					"-strict", "-1",
+					//"-c:v", "copy",
+
+					//"-c:a", "libmp3lame",
+					//"-q:a", "6",
+					"-c:a", "aac",
+					"-b:a", "160k",
+
+					//"-strict", "-1",
+					"-movflags", "+faststart",
 					big)
 				cmd.Stdout = os.Stdout
 				cmd.Stderr = os.Stderr
@@ -252,12 +271,14 @@ func run() error {
 			if _, err := os.Stat(thumb); err != nil {
 				cmd := exec.Command("ffmpeg",
 					"-i", file.Source,
+					"-t", "30",
 					"-vf", fmt.Sprintf("crop=min(in_w\\,in_h):min(in_w\\,in_h), scale=-2:%d", thumbSize),
 					"-an",
 					"-c:v", "libx264",
 					"-preset", "veryfast",
 					"-crf", "30",
 					"-r", "15",
+					"-movflags", "+faststart",
 					thumb)
 				cmd.Stdout = os.Stdout
 				cmd.Stderr = os.Stderr

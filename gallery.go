@@ -44,19 +44,19 @@ img, video {
 
 <div class="folders">
 {{- range .Folders -}}
-<a class="folder" href="{{ .Path }}">{{ .Name }}</a>
+<a class="folder" href="{{ .Prefix }}{{ .Path }}">{{ .Name }}</a>
 {{- end -}}
 </div>
 
 {{- range .Files -}}
 
 {{- if .Image -}}
-<a class="view" href="{{ .ViewPath }}"><img src="{{ .ThumbPath }}" width="{{ .ThumbWidth }}" height="{{ .ThumbHeight }}" /></a>
+<a class="view" href="{{ .Prefix }}{{ .ViewPath }}"><img src="{{ .Prefix }}{{ .ThumbPath }}" width="{{ .ThumbWidth }}" height="{{ .ThumbHeight }}" /></a>
 {{- else -}}
 {{- if .Video -}}
-<a class="view" href="{{ .ViewPath }}"><video autoplay=true loop=true muted=true disableRemotePlayback=true playsinline=true src="{{ .ThumbPath }}" width="{{ .ThumbWidth }}" height="{{ .ThumbHeight }}" /></a>
+<a class="view" href="{{ .Prefix }}{{ .ViewPath }}"><video autoplay=true loop=true muted=true disableRemotePlayback=true playsinline=true src="{{ .Prefix }}{{ .ThumbPath }}" width="{{ .ThumbWidth }}" height="{{ .ThumbHeight }}" /></a>
 {{- else -}}
-<div class="binary"><a href="{{ .Path }}">{{ .Path }}</a> ({{ .SizeNice }})</div>
+<div class="binary"><a href="{{ .Prefix }}{{ .Path }}">{{ .Path }}</a> ({{ .SizeNice }})</div>
 {{- end -}}
 {{- end -}}
 
@@ -89,18 +89,18 @@ img, video {
 <body>
 
 <a href="../">Back</a> |
-{{ .Path }} <a href="{{ .Path }}">Original</a> ({{ .SizeNice }})
+{{ .Path }} <a href="{{ .Prefix }}{{ .Path }}">Original</a> ({{ .SizeNice }})
 
-{{ if .Image }} | <a href="{{ .BigPath }}">Large</a> ({{ .BigSizeNice }}){{ end }}
-{{ if .Video }} | <a href="{{ .BigPath }}">Large</a> ({{ .BigSizeNice }}){{ end }}
+{{ if .Image }} | <a href="{{ .Prefix }}{{ .BigPath }}">Large</a> ({{ .BigSizeNice }}){{ end }}
+{{ if .Video }} | <a href="{{ .Prefix }}{{ .BigPath }}">Large</a> ({{ .BigSizeNice }}){{ end }}
 
 <br />
 
 {{- if .Image -}}
-<img src="{{ .BigPath }}" />
+<img src="{{ .Prefix }}{{ .BigPath }}" />
 {{- end -}}
 {{- if .Video -}}
-<video controls=true autoplay=true playsinline=true src="{{ .BigPath }}" />
+<video controls=true autoplay=true playsinline=true src="{{ .Prefix }}{{ .BigPath }}" />
 {{- end -}}
 
 </body>
