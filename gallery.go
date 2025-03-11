@@ -54,7 +54,14 @@ img, video {
 <a class="view" href="{{ .Prefix }}{{ .ViewPath }}"><img src="{{ .Prefix }}{{ .ThumbPath }}" width="{{ .ThumbWidth }}" height="{{ .ThumbHeight }}" /></a>
 {{- else -}}
 {{- if .Video -}}
-<a class="view" href="{{ .Prefix }}{{ .ViewPath }}"><video autoplay=true loop=true muted=true disableRemotePlayback=true playsinline=true src="{{ .Prefix }}{{ .ThumbPath }}" width="{{ .ThumbWidth }}" height="{{ .ThumbHeight }}" /></a>
+<a class="view" href="{{ .Prefix }}{{ .ViewPath }}">
+{{- if .Season -}}
+<span>Season {{ .Season }}</span>
+{{- end -}}
+{{- if .Episode -}}
+<span> Ep {{ .Episode }}</span>
+{{- end -}}
+<video autoplay=true loop=true muted=true disableRemotePlayback=true playsinline=true src="{{ .Prefix }}{{ .ThumbPath }}" width="{{ .ThumbWidth }}" height="{{ .ThumbHeight }}" /></a>
 {{- else -}}
 <div class="binary"><a href="{{ .Prefix }}{{ .Path }}">{{ .Path }}</a> ({{ .SizeNice }})</div>
 {{- end -}}

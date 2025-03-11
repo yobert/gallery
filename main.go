@@ -6,10 +6,14 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"regexp"
+	"strconv"
 	"strings"
 )
 
 const thumbSize = 128
+
+var episodeRe = regexp.MustCompile(`[sS](\d\d)[eE](\d\d)`)
 
 type File struct {
 	Source string
@@ -31,6 +35,9 @@ type File struct {
 	ThumbHeight int
 
 	Prefix string
+
+	Season  int
+	Episode int
 }
 
 type Folder struct {
@@ -78,7 +85,7 @@ func run() error {
 	fmt.Println("Scanning", src, "...")
 
 	err := filepath.Walk(src, func(fpath string, fi os.FileInfo, err error) error {
-		//fmt.Println(fpath)
+		fmt.Println(fpath)
 
 		suf := strings.TrimPrefix(fpath, src)
 
@@ -138,6 +145,12 @@ func run() error {
 			ViewPath: suf + "_view/",
 			SizeNice: formatSize(fi.Size()),
 			Prefix:   prefix,
+		}
+
+		m := episodeRe.FindStringSubmatch(fpath)
+		if m != nil {
+			file.Season, _ = strconv.Atoi(m[1])
+			file.Episode, _ = strconv.Atoi(m[2])
 		}
 
 		if hasImageSuffix(fpath) {
